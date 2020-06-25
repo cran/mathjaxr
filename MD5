@@ -1,8 +1,9 @@
-75360fcac93ef64dae682754027ad360 *DESCRIPTION
-9fdfeb11f7ddba6f3aab9aaa6b1ac5dd *NAMESPACE
-31dfa60250e77ef9b2175d3f063a461b *NEWS.md
-4dd13f16bc0904188c8dac59ff8a8ccb *README.md
-415d471b8841e006aeba0b4e4fecf948 *build/mathjaxr.pdf
+757748575eaeab6088006f8b270c510d *DESCRIPTION
+b2563da97de523a627abacdde57bef1d *NAMESPACE
+83141e7655cd4f0465d52f36dd61bd1a *NEWS.md
+76a4e13325cbdb461f3639a94394da47 *R/preview_rd.r
+d229f9d001a2ec8432d40807bcdb5722 *README.md
+d7cf666c3be6465fe0b8b010ee2b1e6f *build/mathjaxr.pdf
 977d3e4f816a5a3d5a4fcdfc6fd55133 *inst/doc/mathjax/CONTRIBUTING.md
 3b83ef96387f14655fc854ddc3c6bd57 *inst/doc/mathjax/LICENSE
 f52339959486f93e2533f77c1d46b6c2 *inst/doc/mathjax/README.md
@@ -68,5 +69,6 @@ deb822a461fcad2b0ed5124392262a4e *inst/doc/mathjax/es5/sre/mathmaps/mathmaps_ie.
 feb8d63a06cd67514cc493f694e3a1e8 *inst/doc/mathjax/es5/sre/sre_browser.js
 666d1cf55ebfbe7ac994660756547e40 *inst/doc/mathjax/es5/tex-chtml-full.js
 ccb8a1d1b4f5df7101706c7c2ef28a58 *inst/doc/mathjax/package.json
-41ca9c02331a46477c3593f1109497a0 *man/macros/mathjax.Rd
-94e3fa893591e48e039bd7abef3add77 *man/mathjaxr-package.Rd
+d3a9c8cedc89c0ef9d45cb842912bb6f *man/macros/mathjax.Rd
+8b9740eec868c9545530ebb96b8ef13e *man/mathjaxr-package.Rd
+5c44013848f2bc37c63b6f0e320fafc8 *man/preview_rd.Rd
