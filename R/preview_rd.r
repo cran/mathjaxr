@@ -1,18 +1,29 @@
-preview_rd <- function(Rdfile, view = TRUE, type = "html", verbose = FALSE, dark = FALSE) {
+preview_rd <- function(Rdfile, view = TRUE, type = "html", verbose = FALSE, dark = FALSE, ...) {
 
    if (missing(Rdfile))
-      stop("Need to specify 'Rdfile' argument.")
+      stop("Must specify the 'Rdfile' argument.")
 
    type <- match.arg(type, c("html", "txt", "text", "pdf"))
 
    if (type == "text")
       type <- "txt"
 
+   ddd <- list(...)
+
    # need to load MathJax from the CDN since the \mathjaxr macro
    # won't be able to load MathJax from the local installation
    mjcdn <- Sys.getenv("MATHJAXR_USECDN")
    on.exit(Sys.setenv(MATHJAXR_USECDN = mjcdn))
    Sys.setenv(MATHJAXR_USECDN = "TRUE")
+
+   # temporarily set working dir to location of Rdfile
+   wd <- getwd()
+   dn <- dirname(Rdfile)
+   setwd(dn)
+   on.exit(setwd(wd), add=TRUE)
+
+   # strip path from Rdfile
+   Rdfile <- basename(Rdfile)
 
    # list all .Rd and .rd files in the current dir
    Rdfiles <- list.files(pattern = ".*\\.Rd$")
@@ -47,7 +58,8 @@ preview_rd <- function(Rdfile, view = TRUE, type = "html", verbose = FALSE, dark
    macros <- tools::loadRdMacros(file.path(R.home("share"), "Rd", "macros", "system.Rd"), macros = macros)
 
    # generate name of temp file
-   outfile <- paste0(file.path(tempdir(), Rdfile), ".", type)
+   tmpdir <- tempdir()
+   outfile <- paste0(file.path(tmpdir, Rdfile), ".", type)
 
    if (verbose)
       message("Creating preview file: ", outfile)
@@ -60,16 +72,39 @@ preview_rd <- function(Rdfile, view = TRUE, type = "html", verbose = FALSE, dark
          prefix <- ""
       }
 
-      if (dark) {
-         css <- paste0(prefix, system.file("doc/R_dark.css", package = "mathjaxr"))
+      if (!is.null(ddd$css)) {
+         css <- paste0(prefix, ddd$css)
       } else {
-         css <- paste0(prefix, system.file("html/R.css", package = "mathjaxr"))
+         if (dark) {
+            css <- paste0(prefix, system.file("doc/R_dark.css", package = "mathjaxr"))
+         } else {
+            css <- paste0(prefix, system.file("html/R.css", package = "mathjaxr"))
+         }
+      }
+
+      # copy figures to tmpdir if there are any
+      if (file.exists(paste0(dirname(Rdfile.loc), "/figures"))) {
+         rdtxt <- readLines(Rdfile.loc, warn = FALSE)
+         figloc <- grep("\\figure{", rdtxt, fixed = TRUE)
+         if (length(figloc) > 0L) {
+            figs <- rdtxt[figloc]
+            figs <- sapply(strsplit(figs, "\\figure{", fixed = TRUE), function(x) x[2])
+            figs <- sapply(strsplit(figs, "}", fixed = TRUE), function(x) x[1])
+            status <- TRUE
+            if (!file.exists(paste0(tmpdir, "/figures")))
+               status <- dir.create(paste0(tmpdir, "/figures"), showWarnings = FALSE)
+            if (status) {
+               if (verbose)
+                  message("Copying figure(s) to:  ", paste0(tmpdir, "/figures"))
+               file.copy(paste0(dirname(Rdfile.loc), "/figures/", figs), paste0(tmpdir, "/figures"), overwrite = TRUE)
+            }
+         }
       }
 
       # convert Rd to HTML version
-      html <- tools::Rd2HTML(Rdfile.loc, outfile,
-         macros = macros, permissive = TRUE,
-         stylesheet = css)
+      html <- tools::Rd2HTML(Rdfile.loc, out = outfile,
+         macros = macros, permissive = TRUE, dynamic = TRUE,
+         stylesheet = css, stages = c("build", "install", "render"))
 
       # use viewer if available (as in RStudio); otherwise use browseURL()
       viewer <- getOption("viewer")
@@ -85,7 +120,7 @@ preview_rd <- function(Rdfile, view = TRUE, type = "html", verbose = FALSE, dark
    if (type == "txt") {
 
       # convert Rd to text version and show file
-      txt <- tools::Rd2txt(Rdfile.loc, outfile,
+      txt <- tools::Rd2txt(Rdfile.loc, out = outfile,
          macros = macros, permissive = TRUE)
 
       if (.Platform$GUI == "RStudio") {
