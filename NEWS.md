@@ -1,3 +1,7 @@
+# mathjaxr 1.8-0 (2025-04-30)
+
+* rebuilt for CRAN due to missing 'build/stage23.rdb' file
+
 # mathjaxr 1.6-0 (2022-02-28)
 
 * upgraded MathJax version to 3.2.0
